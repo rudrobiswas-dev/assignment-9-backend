@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "subject": "Mathematics Expert",
+    "price": "$20/hour",
+    "image": "/images/teacher.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Sarah Khan",
+    "subject": "English Tutor",
+    "price": "$18/hour",
+    "image": "/images/teacher2.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Michael Lee",
+    "subject": "Physics Teacher",
+    "price": "$25/hour",
+    "image": "/images/teacher3.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Emma Watson",
+    "subject": "Chemistry Tutor",
+    "price": "$22/hour",
+    "image": "/images/teacher4.jpg"
+  },
+  {
+    "id": 5,
+    "name": "David Miller",
+    "subject": "Biology Expert",
+    "price": "$19/hour",
+    "image": "/images/teacher5.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Sophia Ahmed",
+    "subject": "Programming Mentor",
+    "price": "$30/hour",
+    "image": "/images/teacher6.jpg"
+  }
+]

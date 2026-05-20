@@ -1,3 +1,259 @@
+// // const express = require("express");
+
+// // const cors = require("cors");
+
+// // require("dotenv").config();
+
+// // const {
+// //   MongoClient,
+// //   ServerApiVersion,
+// //   ObjectId,
+// // } = require("mongodb");
+
+// // const jwt = require("jsonwebtoken");
+
+// // const app = express();
+
+// // const port = process.env.PORT || 5000;
+
+// // // middleware
+// // app.use(cors());
+
+// // app.use(express.json());
+
+// // // mongodb uri
+// // const uri =
+// //   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
+// // const client = new MongoClient(uri, {
+
+// //   serverApi: {
+// //     version: ServerApiVersion.v1,
+// //     strict: true,
+// //     deprecationErrors: true,
+// //   },
+
+// // });
+
+// // async function run() {
+
+// //   try {
+
+// //     // collections
+// //     const tutorCollection =
+// //       client
+// //         .db("mediqueueDB")
+// //         .collection("tutors");
+
+// //     const bookingCollection =
+// //       client
+// //         .db("mediqueueDB")
+// //         .collection("bookings");
+
+// //     // =========================
+// //     // ADD TUTOR
+// //     // =========================
+
+// //     app.post("/tutors",
+// //       async (req, res) => {
+
+// //         const tutor = req.body;
+
+// //         const result =
+// //           await tutorCollection.insertOne(
+// //             tutor
+// //           );
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // GET ALL TUTORS
+// //     // =========================
+
+// //     app.get("/tutors",
+// //       async (req, res) => {
+
+// //         const result =
+// //           await tutorCollection
+// //             .find()
+// //             .toArray();
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // FEATURED TUTORS
+// //     // =========================
+
+// //     app.get("/featured-tutors",
+// //       async (req, res) => {
+
+// //         const result =
+// //           await tutorCollection
+// //             .find()
+// //             .limit(6)
+// //             .toArray();
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // SINGLE TUTOR
+// //     // =========================
+
+// //     app.get("/tutors/:id",
+// //       async (req, res) => {
+
+// //         const id = req.params.id;
+
+// //         const query = {
+// //           _id: new ObjectId(id),
+// //         };
+
+// //         const result =
+// //           await tutorCollection.findOne(query);
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // UPDATE TUTOR
+// //     // =========================
+
+// //     app.patch("/tutors/:id",
+// //       async (req, res) => {
+
+// //         const id = req.params.id;
+
+// //         const updatedData =
+// //           req.body;
+
+// //         const filter = {
+// //           _id: new ObjectId(id),
+// //         };
+
+// //         const updatedDoc = {
+// //           $set: updatedData,
+// //         };
+
+// //         const result =
+// //           await tutorCollection.updateOne(
+// //             filter,
+// //             updatedDoc
+// //           );
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // DELETE TUTOR
+// //     // =========================
+
+// //     app.delete("/tutors/:id",
+// //       async (req, res) => {
+
+// //         const id = req.params.id;
+
+// //         const query = {
+// //           _id: new ObjectId(id),
+// //         };
+
+// //         const result =
+// //           await tutorCollection.deleteOne(query);
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // SEARCH TUTOR
+// //     // =========================
+
+// //     app.get("/search",
+// //       async (req, res) => {
+
+// //         const search =
+// //           req.query.name;
+
+// //         const query = {
+
+// //           tutorName: {
+// //             $regex: search,
+// //             $options: "i",
+// //           },
+
+// //         };
+
+// //         const result =
+// //           await tutorCollection
+// //             .find(query)
+// //             .toArray();
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     // =========================
+// //     // FILTER BY DATE
+// //     // =========================
+
+// //     app.get("/filter",
+// //       async (req, res) => {
+
+// //         const {
+// //           startDate,
+// //           endDate,
+// //         } = req.query;
+
+// //         const query = {
+
+// //           sessionDate: {
+
+// //             $gte: startDate,
+
+// //             $lte: endDate,
+
+// //           },
+
+// //         };
+
+// //         const result =
+// //           await tutorCollection
+// //             .find(query)
+// //             .toArray();
+
+// //         res.send(result);
+// //       }
+// //     );
+
+// //     console.log(
+// //       "MongoDB Connected"
+// //     );
+
+// //   } finally {
+
+// //   }
+// // }
+
+// // run().catch(console.dir);
+
+// // // root route
+// // app.get("/", (req, res) => {
+// //   res.send("MediQueue Server Running");
+// // });
+
+// // // server
+// // app.listen(port, () => {
+// //   console.log(
+// //     `Server running on ${port}`
+// //   );
+// // });
 // const express = require("express");
 
 // const cors = require("cors");
@@ -21,19 +277,60 @@
 
 // app.use(express.json());
 
+// // jwt middleware
+// const verifyToken =
+//   (req, res, next) => {
+
+//     const authHeader =
+//       req.headers.authorization;
+
+//     if (!authHeader) {
+
+//       return res.status(401).send({
+//         message: "Unauthorized",
+//       });
+//     }
+
+//     const token =
+//       authHeader.split(" ")[1];
+
+//     jwt.verify(
+//       token,
+//       process.env.JWT_SECRET,
+//       (err, decoded) => {
+
+//         if (err) {
+
+//           return res.status(403).send({
+//             message: "Forbidden",
+//           });
+//         }
+
+//         req.decoded = decoded;
+
+//         next();
+//       }
+//     );
+//   };
+
 // // mongodb uri
 // const uri =
-//   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+//   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fjjdbj0.mongodb.net/?appName=Cluster0`;
 
-// const client = new MongoClient(uri, {
+// const client =
+//   new MongoClient(uri, {
 
-//   serverApi: {
-//     version: ServerApiVersion.v1,
-//     strict: true,
-//     deprecationErrors: true,
-//   },
+//     serverApi: {
 
-// });
+//       version:
+//         ServerApiVersion.v1,
+
+//       strict: true,
+
+//       deprecationErrors: true,
+//     },
+
+//   });
 
 // async function run() {
 
@@ -50,10 +347,25 @@
 //         .db("mediqueueDB")
 //         .collection("bookings");
 
-//     // =========================
-//     // ADD TUTOR
-//     // =========================
+//     // JWT ROUTE
+//     app.post("/jwt",
+//       async (req, res) => {
 
+//         const user = req.body;
+
+//         const token = jwt.sign(
+//           user,
+//           process.env.JWT_SECRET,
+//           {
+//             expiresIn: "7d",
+//           }
+//         );
+
+//         res.send({ token });
+//       }
+//     );
+
+//     // ADD TUTOR
 //     app.post("/tutors",
 //       async (req, res) => {
 
@@ -68,10 +380,7 @@
 //       }
 //     );
 
-//     // =========================
 //     // GET ALL TUTORS
-//     // =========================
-
 //     app.get("/tutors",
 //       async (req, res) => {
 
@@ -84,10 +393,7 @@
 //       }
 //     );
 
-//     // =========================
 //     // FEATURED TUTORS
-//     // =========================
-
 //     app.get("/featured-tutors",
 //       async (req, res) => {
 
@@ -101,17 +407,16 @@
 //       }
 //     );
 
-//     // =========================
 //     // SINGLE TUTOR
-//     // =========================
-
 //     app.get("/tutors/:id",
 //       async (req, res) => {
 
-//         const id = req.params.id;
+//         const id =
+//           req.params.id;
 
 //         const query = {
-//           _id: new ObjectId(id),
+//           _id:
+//             new ObjectId(id),
 //         };
 
 //         const result =
@@ -121,24 +426,25 @@
 //       }
 //     );
 
-//     // =========================
 //     // UPDATE TUTOR
-//     // =========================
-
 //     app.patch("/tutors/:id",
 //       async (req, res) => {
 
-//         const id = req.params.id;
+//         const id =
+//           req.params.id;
 
 //         const updatedData =
 //           req.body;
 
 //         const filter = {
-//           _id: new ObjectId(id),
+//           _id:
+//             new ObjectId(id),
 //         };
 
 //         const updatedDoc = {
+
 //           $set: updatedData,
+
 //         };
 
 //         const result =
@@ -151,17 +457,16 @@
 //       }
 //     );
 
-//     // =========================
 //     // DELETE TUTOR
-//     // =========================
-
 //     app.delete("/tutors/:id",
 //       async (req, res) => {
 
-//         const id = req.params.id;
+//         const id =
+//           req.params.id;
 
 //         const query = {
-//           _id: new ObjectId(id),
+//           _id:
+//             new ObjectId(id),
 //         };
 
 //         const result =
@@ -171,10 +476,7 @@
 //       }
 //     );
 
-//     // =========================
-//     // SEARCH TUTOR
-//     // =========================
-
+//     // SEARCH
 //     app.get("/search",
 //       async (req, res) => {
 
@@ -184,8 +486,11 @@
 //         const query = {
 
 //           tutorName: {
+
 //             $regex: search,
+
 //             $options: "i",
+
 //           },
 
 //         };
@@ -199,10 +504,7 @@
 //       }
 //     );
 
-//     // =========================
-//     // FILTER BY DATE
-//     // =========================
-
+//     // FILTER
 //     app.get("/filter",
 //       async (req, res) => {
 
@@ -232,6 +534,103 @@
 //       }
 //     );
 
+//     // CREATE BOOKING
+// app.post("/bookings", async (req, res) => {
+//   const booking = req.body;
+//   const tutorId = booking.tutorId;
+
+//   // find tutor
+//   const tutor = await tutorCollection.findOne({
+//     _id: new ObjectId(tutorId),
+//   });
+
+//   // tutor not found
+//   if (!tutor) {
+//     return res.send({
+//       message: "Tutor not found",
+//     });
+//   }
+
+//   // SLOT CHECK
+//   if (tutor.totalSlot <= 0) {
+//     return res.send({
+//       message: "This session is fully booked. You can’t join at the moment.",
+//     });
+//   }
+
+//   // DATE CHECK
+//   const today = new Date();
+//   const sessionDate = new Date(tutor.sessionDate);
+
+//   if (today < sessionDate) {
+//     return res.send({
+//       message: "Booking is not available yet for this tutor",
+//     });
+//   }
+
+//   // INSERT BOOKING
+//   const result = await bookingCollection.insertOne({
+//     ...booking,
+//     status: "booked",
+//     createdAt: new Date(),
+//   });
+
+//   // DECREASE SLOT
+//   await tutorCollection.updateOne(
+//     { _id: new ObjectId(tutorId) },
+//     { $inc: { totalSlot: -1 } }
+//   );
+
+//   res.send(result);
+// });
+
+
+// // USER BOOKINGS
+// app.get("/my-bookings", verifyToken, async (req, res) => {
+//   const email = req.query.email;
+
+//   const query = {
+//     studentEmail: email,
+//   };
+
+//   const result = await bookingCollection.find(query).toArray();
+
+//   res.send(result);
+// });
+
+
+// // CANCEL BOOKING
+// app.patch("/bookings/:id", async (req, res) => {
+//   const id = req.params.id;
+
+//   const filter = {
+//     _id: new ObjectId(id),
+//   };
+
+//   const booking = await bookingCollection.findOne(filter);
+
+//   if (!booking) {
+//     return res.send({ message: "Booking not found" });
+//   }
+
+//   if (booking.status === "cancelled") {
+//     return res.send({ message: "Already cancelled" });
+//   }
+
+//   // UPDATE STATUS
+//   const result = await bookingCollection.updateOne(filter, {
+//     $set: { status: "cancelled" },
+//   });
+
+//   // RETURN SLOT
+//   await tutorCollection.updateOne(
+//     { _id: new ObjectId(booking.tutorId) },
+//     { $inc: { totalSlot: 1 } }
+//   );
+
+//   res.send(result);
+// });
+
 //     console.log(
 //       "MongoDB Connected"
 //     );
@@ -243,21 +642,17 @@
 
 // run().catch(console.dir);
 
-// // root route
 // app.get("/", (req, res) => {
 //   res.send("MediQueue Server Running");
 // });
 
-// // server
 // app.listen(port, () => {
 //   console.log(
 //     `Server running on ${port}`
 //   );
 // });
 const express = require("express");
-
 const cors = require("cors");
-
 require("dotenv").config();
 
 const {
@@ -269,409 +664,375 @@ const {
 const jwt = require("jsonwebtoken");
 
 const app = express();
-
 const port = process.env.PORT || 5000;
 
-// middleware
+// =======================
+// MIDDLEWARE
+// =======================
 app.use(cors());
-
 app.use(express.json());
 
-// jwt middleware
-const verifyToken =
-  (req, res, next) => {
+// =======================
+// JWT VERIFY MIDDLEWARE
+// =======================
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-    const authHeader =
-      req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({
+      message: "Unauthorized Access",
+    });
+  }
 
-    if (!authHeader) {
+  const token = authHeader.split(" ")[1];
 
-      return res.status(401).send({
-        message: "Unauthorized",
-      });
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (err, decoded) => {
+      if (err) {
+        return res.status(403).send({
+          message: "Forbidden Access",
+        });
+      }
+
+      req.decoded = decoded;
+      next();
     }
+  );
+};
 
-    const token =
-      authHeader.split(" ")[1];
+// =======================
+// MONGODB URI
+// =======================
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fjjdbj0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-    jwt.verify(
-      token,
-      process.env.JWT_SECRET,
-      (err, decoded) => {
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 
-        if (err) {
-
-          return res.status(403).send({
-            message: "Forbidden",
-          });
-        }
-
-        req.decoded = decoded;
-
-        next();
-      }
-    );
-  };
-
-// mongodb uri
-const uri =
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fjjdbj0.mongodb.net/?appName=Cluster0`;
-
-const client =
-  new MongoClient(uri, {
-
-    serverApi: {
-
-      version:
-        ServerApiVersion.v1,
-
-      strict: true,
-
-      deprecationErrors: true,
-    },
-
-  });
-
+// =======================
+// DATABASE FUNCTION
+// =======================
 async function run() {
-
   try {
+    // =======================
+    // COLLECTIONS
+    // =======================
+    const tutorCollection = client
+      .db("mediqueueDB")
+      .collection("tutors");
 
-    // collections
-    const tutorCollection =
-      client
-        .db("mediqueueDB")
-        .collection("tutors");
+    const bookingCollection = client
+      .db("mediqueueDB")
+      .collection("bookings");
 
-    const bookingCollection =
-      client
-        .db("mediqueueDB")
-        .collection("bookings");
-
+    // =======================
     // JWT ROUTE
-    app.post("/jwt",
-      async (req, res) => {
+    // =======================
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
 
-        const user = req.body;
+      const token = jwt.sign(
+        user,
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
 
-        const token = jwt.sign(
-          user,
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "7d",
-          }
-        );
+      res.send({ token });
+    });
 
-        res.send({ token });
-      }
-    );
-
+    // =======================
     // ADD TUTOR
-    app.post("/tutors",
-      async (req, res) => {
+    // =======================
+    app.post("/tutors", async (req, res) => {
+      const tutor = req.body;
 
-        const tutor = req.body;
+      const result =
+        await tutorCollection.insertOne(tutor);
 
-        const result =
-          await tutorCollection.insertOne(
-            tutor
-          );
+      res.send(result);
+    });
 
-        res.send(result);
-      }
-    );
+    
 
-    // GET ALL TUTORS
-    app.get("/tutors",
-      async (req, res) => {
-
-        const result =
-          await tutorCollection
-            .find()
-            .toArray();
-
-        res.send(result);
-      }
-    );
-
+    // =======================
     // FEATURED TUTORS
-    app.get("/featured-tutors",
-      async (req, res) => {
+    // =======================
+    app.get("/featured-tutors", async (req, res) => {
+      const result =
+        await tutorCollection
+          .find()
+          .limit(6)
+          .toArray();
 
-        const result =
-          await tutorCollection
-            .find()
-            .limit(6)
-            .toArray();
+      res.send(result);
+    });
 
-        res.send(result);
-      }
-    );
-
+    // =======================
     // SINGLE TUTOR
-    app.get("/tutors/:id",
-      async (req, res) => {
+    // =======================
+    app.get("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
 
-        const id =
-          req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
 
-        const query = {
-          _id:
-            new ObjectId(id),
-        };
+      const result =
+        await tutorCollection.findOne(query);
 
-        const result =
-          await tutorCollection.findOne(query);
+      res.send(result);
+    });
 
-        res.send(result);
-      }
-    );
-
+    // =======================
     // UPDATE TUTOR
-    app.patch("/tutors/:id",
-      async (req, res) => {
+    // =======================
+    app.patch("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
 
-        const id =
-          req.params.id;
+      const updatedData = req.body;
 
-        const updatedData =
-          req.body;
+      const filter = {
+        _id: new ObjectId(id),
+      };
 
-        const filter = {
-          _id:
-            new ObjectId(id),
-        };
+      const updatedDoc = {
+        $set: updatedData,
+      };
 
-        const updatedDoc = {
-
-          $set: updatedData,
-
-        };
-
-        const result =
-          await tutorCollection.updateOne(
-            filter,
-            updatedDoc
-          );
-
-        res.send(result);
-      }
-    );
-
-    // DELETE TUTOR
-    app.delete("/tutors/:id",
-      async (req, res) => {
-
-        const id =
-          req.params.id;
-
-        const query = {
-          _id:
-            new ObjectId(id),
-        };
-
-        const result =
-          await tutorCollection.deleteOne(query);
-
-        res.send(result);
-      }
-    );
-
-    // SEARCH
-    app.get("/search",
-      async (req, res) => {
-
-        const search =
-          req.query.name;
-
-        const query = {
-
-          tutorName: {
-
-            $regex: search,
-
-            $options: "i",
-
-          },
-
-        };
-
-        const result =
-          await tutorCollection
-            .find(query)
-            .toArray();
-
-        res.send(result);
-      }
-    );
-
-    // FILTER
-    app.get("/filter",
-      async (req, res) => {
-
-        const {
-          startDate,
-          endDate,
-        } = req.query;
-
-        const query = {
-
-          sessionDate: {
-
-            $gte: startDate,
-
-            $lte: endDate,
-
-          },
-
-        };
-
-        const result =
-          await tutorCollection
-            .find(query)
-            .toArray();
-
-        res.send(result);
-      }
-    );
-
-    // CREATE BOOKING
-    app.post("/bookings",
-      async (req, res) => {
-
-        const booking =
-          req.body;
-
-        const tutorId =
-          booking.tutorId;
-
-        // find tutor
-        const tutor =
-          await tutorCollection.findOne({
-
-            _id:
-              new ObjectId(tutorId),
-
-          });
-
-        // slot check
-        if (
-          tutor.totalSlot <= 0
-        ) {
-
-          return res.send({
-
-            message:
-              "No available slots left",
-
-          });
-        }
-
-        // date check
-        const today =
-          new Date();
-
-        const sessionDate =
-          new Date(
-            tutor.sessionDate
-          );
-
-        if (today < sessionDate) {
-
-          return res.send({
-
-            message:
-              "Booking is not available yet",
-
-          });
-        }
-
-        // insert booking
-        const result =
-          await bookingCollection.insertOne(
-            booking
-          );
-
-        // decrease slot
+      const result =
         await tutorCollection.updateOne(
-          {
-            _id:
-              new ObjectId(tutorId),
-          },
-          {
-            $inc: {
-              totalSlot: -1,
-            },
-          }
+          filter,
+          updatedDoc
         );
 
-        res.send(result);
-      }
-    );
+      res.send(result);
+    });
 
+    // =======================
+    // DELETE TUTOR
+    // =======================
+    app.delete("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const result =
+        await tutorCollection.deleteOne(query);
+
+      res.send(result);
+    });
+
+   // =======================
+ // GET TUTORS + FILTER
+ // =======================
+ app.get("/tutors", async (req, res) => {
+
+   const {
+     search,
+     startDate,
+     endDate,
+   } = req.query;
+
+   let query = {};
+
+   // SEARCH BY NAME
+   if (search) {
+
+     query.name = {
+       $regex: search,
+       $options: "i",
+     };
+
+   }
+
+   // FILTER BY DATE
+   if (startDate && endDate) {
+
+     query.sessionDate = {
+       $gte: startDate,
+       $lte: endDate,
+     };
+
+   }
+
+   const result =
+     await tutorCollection
+       .find(query)
+       .toArray();
+
+   res.send(result);
+
+ });
+
+    // =======================
+    // CREATE BOOKING
+    // =======================
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+
+      const tutorId = booking.tutorId;
+
+      // FIND TUTOR
+      const tutor =
+        await tutorCollection.findOne({
+          _id: new ObjectId(tutorId),
+        });
+
+      // TUTOR NOT FOUND
+      if (!tutor) {
+        return res.send({
+          message: "Tutor not found",
+        });
+      }
+
+      // SLOT CHECK
+      if (tutor.totalSlot <= 0) {
+        return res.send({
+          message:
+            "This session is fully booked. You can't join right now.",
+        });
+      }
+
+      // DATE CHECK
+      const today = new Date();
+      const sessionDate = new Date(
+        tutor.sessionDate
+      );
+
+      if (today < sessionDate) {
+        return res.send({
+          message:
+            "Booking is not available yet for this tutor",
+        });
+      }
+
+      // CHECK DUPLICATE BOOKING
+      const alreadyBooked =
+        await bookingCollection.findOne({
+          tutorId: tutorId,
+          studentEmail:
+            booking.studentEmail,
+        });
+
+      if (alreadyBooked) {
+        return res.send({
+          message:
+            "You already booked this tutor",
+        });
+      }
+
+      // INSERT BOOKING
+      const result =
+        await bookingCollection.insertOne({
+          ...booking,
+          status: "booked",
+          createdAt: new Date(),
+        });
+
+      // DECREASE SLOT
+      await tutorCollection.updateOne(
+        {
+          _id: new ObjectId(tutorId),
+        },
+        {
+          $inc: {
+            totalSlot: -1,
+          },
+        }
+      );
+
+      res.send(result);
+    });
+
+    // =======================
     // USER BOOKINGS
-    app.get(
-      "/my-bookings",
+    // =======================
+    
+app.get(
+  "/my-bookings",
+  async (req, res) => {
 
-      verifyToken,
+    const email =
+      req.query.email;
 
-      async (req, res) => {
+    const query = {
+      studentEmail: email,
+    };
 
-        const email =
-          req.query.email;
+    const result =
+      await bookingCollection
+        .find(query)
+        .toArray();
 
-        const query = {
-          studentEmail: email,
-        };
+    res.send(result);
 
-        const result =
-          await bookingCollection
-            .find(query)
-            .toArray();
+  }
+);200022
 
-        res.send(result);
-      }
-    );
-
+    // =======================
     // CANCEL BOOKING
-    app.patch("/bookings/:id",
+    // =======================
+    app.patch(
+      "/bookings/:id",
       async (req, res) => {
-
-        const id =
-          req.params.id;
+        const id = req.params.id;
 
         const filter = {
-          _id:
-            new ObjectId(id),
+          _id: new ObjectId(id),
         };
 
-        // find booking
         const booking =
           await bookingCollection.findOne(
             filter
           );
 
-        // update status
-        const updatedDoc = {
+        // BOOKING NOT FOUND
+        if (!booking) {
+          return res.send({
+            message:
+              "Booking not found",
+          });
+        }
 
-          $set: {
-            status: "cancelled",
-          },
+        // ALREADY CANCELLED
+        if (
+          booking.status ===
+          "cancelled"
+        ) {
+          return res.send({
+            message:
+              "Already cancelled",
+          });
+        }
 
-        };
-
+        // UPDATE STATUS
         const result =
           await bookingCollection.updateOne(
             filter,
-            updatedDoc
+            {
+              $set: {
+                status:
+                  "cancelled",
+              },
+            }
           );
 
-        // return slot
+        // RETURN SLOT
         await tutorCollection.updateOne(
           {
-            _id:
-              new ObjectId(
-                booking.tutorId
-              ),
+            _id: new ObjectId(
+              booking.tutorId
+            ),
           },
           {
             $inc: {
@@ -684,23 +1045,25 @@ async function run() {
       }
     );
 
-    console.log(
-      "MongoDB Connected"
-    );
-
+    console.log("MongoDB Connected");
   } finally {
-
   }
 }
 
 run().catch(console.dir);
 
+// =======================
+// ROOT ROUTE
+// =======================
 app.get("/", (req, res) => {
   res.send("MediQueue Server Running");
 });
 
+// =======================
+// SERVER
+// =======================
 app.listen(port, () => {
   console.log(
-    `Server running on ${port}`
+    `Server running on port ${port}`
   );
 });

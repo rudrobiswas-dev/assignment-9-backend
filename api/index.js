@@ -408,3 +408,6 @@ run().catch(console.dir);
 app.get("/", (req, res) => {
   res.send("MediQueue Server Running");
 });
+
+
+module.exports = app;

@@ -62,10 +62,10 @@ const client = new MongoClient(uri, {
 // =======================
     let isConnected = false;
 
-  async function run() {
-    try {
-      if (!isConnected) {
-        await client.connect();
+async function run() {
+  try {
+    if (!isConnected) {
+      await client.connect();
       isConnected = true;
       
     }
@@ -290,6 +290,16 @@ const client = new MongoClient(uri, {
   }
 }
 
+run().catch(console.dir);
+
+// =======================
+// ROOT
+// =======================
+app.get("/", (req, res) => {
+  res.send("MediQueue Server Running");
+});
+
+module.exports = app;
 
 // =======================
 // START SERVER
@@ -305,11 +315,10 @@ const client = new MongoClient(uri, {
 //   res.send(result);
 // });
 
-run().catch(console.dir);
+// run().catch(console.dir);
 
-app.get("/", (req, res) => {
-  res.send("MediQueue Server Running");
-});
+// app.get("/", (req, res) => {
+//   res.send("MediQueue Server Running");
+// });
 
-module.exports = app;
-
+// module.exports = app;

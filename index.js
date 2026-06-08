@@ -1,326 +1,20 @@
 
 
 
-// const express = require("express");
-// const cors = require("cors");
-// require("dotenv").config();
-
-// const {
-//   MongoClient,
-//   ServerApiVersion,
-//   ObjectId,
-// } = require("mongodb");
-
-// const jwt = require("jsonwebtoken");
-
-// const app = express();
-// // const port = process.env.PORT || 5000;
-
-// // =======================
-// // MIDDLEWARE
-// // =======================
-// app.use(cors());
-// app.use(express.json());
-
-// // =======================
-// // JWT VERIFY (optional use later)
-// // =======================
-// const verifyToken = (req, res, next) => {
-//   const authHeader = req.headers.authorization;
-
-//   if (!authHeader) {
-//     return res.status(401).send({ message: "Unauthorized Access" });
-//   }
-
-//   const token = authHeader.split(" ")[1];
-
-//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-//     if (err) {
-//       return res.status(403).send({ message: "Forbidden Access" });
-//     }
-
-//     req.decoded = decoded;
-//     next();
-//   });
-// };
-
-// // =======================
-// // DATABASE
-// // =======================
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fjjdbj0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-// const client = new MongoClient(uri, {
-//   serverApi: {
-//     version: ServerApiVersion.v1,
-//     strict: true,
-//     deprecationErrors: true,
-//   },
-// });
-
-// // =======================
-// // MAIN RUN
-// // =======================
-//     let isConnected = false;
-
-// async function run() {
-//   try {
-//     if (!isConnected) {
-//       await client.connect();
-//       isConnected = true;
-      
-//     }
-
-//     const db = client.db("mediqueueDB");
-//     const tutorCollection = db.collection("tutors");
-//     const bookingCollection = db.collection("bookings");
-
-//     // routes...
-
-//     // =======================
-//     // JWT TOKEN
-//     // =======================
-//     app.post("/jwt", async (req, res) => {
-//       const token = jwt.sign(req.body, process.env.JWT_SECRET, {
-//         expiresIn: "7d",
-//       });
-
-//       res.send({ token });
-//     });
-
-//     // =======================
-//     // ADD TUTOR
-//     // =======================
-//     app.post("/tutors", async (req, res) => {
-//       const result = await tutorCollection.insertOne(req.body);
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // GET TUTORS (FILTER + SEARCH)
-//     // =======================
-//     app.get("/tutors", async (req, res) => {
-//   const { search, startDate, endDate } = req.query;
-
-//   let query = {};
-
-//   if (search) {
-//     query.tutorName = { $regex: search, $options: "i" };
-//   }
-
-//   // keep as string comparison — matches how you saved it
-//   if (startDate && endDate) {
-//     query.sessionStart = {
-//       $gte: startDate,
-//       $lte: endDate,
-//     };
-//   }
-
-//   const result = await tutorCollection.find(query).toArray();
-//   res.send(result);
-// });
-
-//     // =======================
-//     // FEATURED TUTORS
-//     // =======================
-//     app.get("/featured-tutors", async (req, res) => {
-//       const result = await tutorCollection.find().limit(6).toArray();
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // SINGLE TUTOR
-//     // =======================
-//     app.get("/tutors/:id", async (req, res) => {
-//       const result = await tutorCollection.findOne({
-//         _id: new ObjectId(req.params.id),
-//       });
-
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // UPDATE TUTOR
-//     // =======================
-//     app.patch("/tutors/:id", async (req, res) => {
-//       const result = await tutorCollection.updateOne(
-//         { _id: new ObjectId(req.params.id) },
-//         { $set: req.body }
-//       );
-
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // DELETE TUTOR
-//     // =======================
-//     app.delete("/tutors/:id", async (req, res) => {
-//       const result = await tutorCollection.deleteOne({
-//         _id: new ObjectId(req.params.id),
-//       });
-
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // CREATE BOOKING
-//     // =======================
-//     app.post("/bookings", async (req, res) => {
-//       const booking = req.body;
-
-//       const tutor = await tutorCollection.findOne({
-//         _id: new ObjectId(booking.tutorId),
-//       });
-
-//       if (!tutor) return res.send({ message: "Tutor not found" });
-
-//       if (tutor.totalSlot <= 0)
-//         return res.send({ message: "No slots available" });
-
-//       const alreadyBooked = await bookingCollection.findOne({
-//         tutorId: booking.tutorId,
-//         studentEmail: booking.studentEmail,
-//       });
-
-//       if (alreadyBooked)
-//         return res.send({ message: "Already booked" });
-
-//       const result = await bookingCollection.insertOne({
-//         ...booking,
-//         status: "booked",
-//         createdAt: new Date(),
-//       });
-
-//       await tutorCollection.updateOne(
-//         { _id: new ObjectId(booking.tutorId) },
-//         { $inc: { totalSlot: -1 } }
-//       );
-
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // MY BOOKINGS
-//     // =======================
-//     app.get("/my-bookings", async (req, res) => {
-//       const result = await bookingCollection
-//         .find({ studentEmail: req.query.email })
-//         .toArray();
-
-//       res.send(result);
-//     });
-
-//     // =======================
-//     // CANCEL BOOKING
-//     // =======================
-//     app.patch("/bookings/:id", async (req, res) => {
-//       const id = req.params.id;
-
-//       const booking = await bookingCollection.findOne({
-//         _id: new ObjectId(id),
-//       });
-
-//       if (!booking) return res.send({ message: "Not found" });
-
-//       if (booking.status === "cancelled")
-//         return res.send({ message: "Already cancelled" });
-
-//       const result = await bookingCollection.updateOne(
-//         { _id: new ObjectId(id) },
-//         { $set: { status: "cancelled" } }
-//       );
-
-//       await tutorCollection.updateOne(
-//         { _id: new ObjectId(booking.tutorId) },
-//         { $inc: { totalSlot: 1 } }
-//       );
-
-//       res.send(result);
-//     });
-
-// // =======================
-//     // add new BOOKING
-//     // =======================
-
-//     app.patch("/bookings/update/:id", async (req, res) => {
-//   const id = req.params.id;
-
-//   const updateDoc = {
-//     $set: {
-//       tutorName: req.body.tutorName,
-//       studentName: req.body.studentName,
-//       subject: req.body.subject,
-//       phone: req.body.phone,
-//       sessionStart: req.body.sessionStart,
-//     },
-//   };
-
-//   const result = await bookingCollection.updateOne(
-//     { _id: new ObjectId(id) },
-//     updateDoc
-//   );
-
-//   res.send(result);
-// });
-
-//     // =======================
-//     // DELETE BOOKING
-//     // =======================
-//     app.delete("/bookings/:id", async (req, res) => {
-//       const booking = await bookingCollection.findOne({
-//         _id: new ObjectId(req.params.id),
-//       });
-
-//       if (!booking) return res.send({ message: "Not found" });
-
-//       await tutorCollection.updateOne(
-//         { _id: new ObjectId(booking.tutorId) },
-//         { $inc: { totalSlot: 1 } }
-//       );
-
-//       const result = await bookingCollection.deleteOne({
-//         _id: new ObjectId(req.params.id),
-//       });
-
-//       res.send(result);
-//     });
-
-//     console.log("MongoDB Connected");
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
-
-
-// // =======================
-// // START SERVER
-// // =======================
-// // app.listen(port, () => {
-// //   console.log(`Server running on port ${port}`);
-// // });
-
-
-
-// // app.get("/featured-tutors", async (req, res) => {
-// //   const result = await tutorCollection.find().limit(6).toArray();
-// //   res.send(result);
-// // });
-
-// // run().catch(console.dir);
-
-// // app.get("/", (req, res) => {
-// //   res.send("MediQueue Server Running");
-// // });
-
-// // module.exports = app;
-
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+} = require("mongodb");
+
 const jwt = require("jsonwebtoken");
 
 const app = express();
+const port = process.env.PORT || 5000;
 
 // =======================
 // MIDDLEWARE
@@ -329,7 +23,29 @@ app.use(cors());
 app.use(express.json());
 
 // =======================
-// MONGO SETUP
+// JWT VERIFY (optional use later)
+// =======================
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send({ message: "Unauthorized Access" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden Access" });
+    }
+
+    req.decoded = decoded;
+    next();
+  });
+};
+
+// =======================
+// DATABASE
 // =======================
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fjjdbj0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -341,47 +57,48 @@ const client = new MongoClient(uri, {
   },
 });
 
-let db;
-let tutorCollection;
-let bookingCollection;
-
-// connect once
-async function connectDB() {
-  if (!db) {
-    await client.connect();
-    db = client.db("mediqueueDB");
-    tutorCollection = db.collection("tutors");
-    bookingCollection = db.collection("bookings");
-    console.log("MongoDB Connected");
-  }
-}
-
-// run DB before every request
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
-
 // =======================
-// JWT
+// MAIN RUN
 // =======================
-app.post("/jwt", (req, res) => {
-  const token = jwt.sign(req.body, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+    let isConnected = false;
 
-  res.send({ token });
-});
+async function run() {
+  try {
+    if (!isConnected) {
+      await client.connect();
+      isConnected = true;
+      
+    }
 
-// =======================
-// TUTORS
-// =======================
-app.post("/tutors", async (req, res) => {
-  const result = await tutorCollection.insertOne(req.body);
-  res.send(result);
-});
+    const db = client.db("mediqueueDB");
+    const tutorCollection = db.collection("tutors");
+    const bookingCollection = db.collection("bookings");
 
-app.get("/tutors", async (req, res) => {
+    // routes...
+
+    // =======================
+    // JWT TOKEN
+    // =======================
+    app.post("/jwt", async (req, res) => {
+      const token = jwt.sign(req.body, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      res.send({ token });
+    });
+
+    // =======================
+    // ADD TUTOR
+    // =======================
+    app.post("/tutors", async (req, res) => {
+      const result = await tutorCollection.insertOne(req.body);
+      res.send(result);
+    });
+
+    // =======================
+    // GET TUTORS (FILTER + SEARCH)
+    // =======================
+    app.get("/tutors", async (req, res) => {
   const { search, startDate, endDate } = req.query;
 
   let query = {};
@@ -390,6 +107,7 @@ app.get("/tutors", async (req, res) => {
     query.tutorName = { $regex: search, $options: "i" };
   }
 
+  // keep as string comparison — matches how you saved it
   if (startDate && endDate) {
     query.sessionStart = {
       $gte: startDate,
@@ -401,145 +119,197 @@ app.get("/tutors", async (req, res) => {
   res.send(result);
 });
 
-app.get("/featured-tutors", async (req, res) => {
-  const result = await tutorCollection.find().limit(6).toArray();
-  res.send(result);
-});
+    // =======================
+    // FEATURED TUTORS
+    // =======================
+    app.get("/featured-tutors", async (req, res) => {
+      const result = await tutorCollection.find().limit(6).toArray();
+      res.send(result);
+    });
 
-app.get("/tutors/:id", async (req, res) => {
-  const result = await tutorCollection.findOne({
-    _id: new ObjectId(req.params.id),
-  });
+    // =======================
+    // SINGLE TUTOR
+    // =======================
+    app.get("/tutors/:id", async (req, res) => {
+      const result = await tutorCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
 
-  res.send(result);
-});
+      res.send(result);
+    });
 
-app.patch("/tutors/:id", async (req, res) => {
-  const result = await tutorCollection.updateOne(
-    { _id: new ObjectId(req.params.id) },
-    { $set: req.body }
-  );
+    // =======================
+    // UPDATE TUTOR
+    // =======================
+    app.patch("/tutors/:id", async (req, res) => {
+      const result = await tutorCollection.updateOne(
+        { _id: new ObjectId(req.params.id) },
+        { $set: req.body }
+      );
 
-  res.send(result);
-});
+      res.send(result);
+    });
 
-app.delete("/tutors/:id", async (req, res) => {
-  const result = await tutorCollection.deleteOne({
-    _id: new ObjectId(req.params.id),
-  });
+    // =======================
+    // DELETE TUTOR
+    // =======================
+    app.delete("/tutors/:id", async (req, res) => {
+      const result = await tutorCollection.deleteOne({
+        _id: new ObjectId(req.params.id),
+      });
 
-  res.send(result);
-});
+      res.send(result);
+    });
+
+    // =======================
+    // CREATE BOOKING
+    // =======================
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+
+      const tutor = await tutorCollection.findOne({
+        _id: new ObjectId(booking.tutorId),
+      });
+
+      if (!tutor) return res.send({ message: "Tutor not found" });
+
+      if (tutor.totalSlot <= 0)
+        return res.send({ message: "No slots available" });
+
+      const alreadyBooked = await bookingCollection.findOne({
+        tutorId: booking.tutorId,
+        studentEmail: booking.studentEmail,
+      });
+
+      if (alreadyBooked)
+        return res.send({ message: "Already booked" });
+
+      const result = await bookingCollection.insertOne({
+        ...booking,
+        status: "booked",
+        createdAt: new Date(),
+      });
+
+      await tutorCollection.updateOne(
+        { _id: new ObjectId(booking.tutorId) },
+        { $inc: { totalSlot: -1 } }
+      );
+
+      res.send(result);
+    });
+
+    // =======================
+    // MY BOOKINGS
+    // =======================
+    app.get("/my-bookings", async (req, res) => {
+      const result = await bookingCollection
+        .find({ studentEmail: req.query.email })
+        .toArray();
+
+      res.send(result);
+    });
+
+    // =======================
+    // CANCEL BOOKING
+    // =======================
+    app.patch("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const booking = await bookingCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      if (!booking) return res.send({ message: "Not found" });
+
+      if (booking.status === "cancelled")
+        return res.send({ message: "Already cancelled" });
+
+      const result = await bookingCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status: "cancelled" } }
+      );
+
+      await tutorCollection.updateOne(
+        { _id: new ObjectId(booking.tutorId) },
+        { $inc: { totalSlot: 1 } }
+      );
+
+      res.send(result);
+    });
 
 // =======================
-// BOOKINGS
-// =======================
-app.post("/bookings", async (req, res) => {
-  const booking = req.body;
+    // add new BOOKING
+    // =======================
 
-  const tutor = await tutorCollection.findOne({
-    _id: new ObjectId(booking.tutorId),
-  });
+    app.patch("/bookings/update/:id", async (req, res) => {
+  const id = req.params.id;
 
-  if (!tutor) return res.send({ message: "Tutor not found" });
-
-  if (tutor.totalSlot <= 0)
-    return res.send({ message: "No slots available" });
-
-  const alreadyBooked = await bookingCollection.findOne({
-    tutorId: booking.tutorId,
-    studentEmail: booking.studentEmail,
-  });
-
-  if (alreadyBooked)
-    return res.send({ message: "Already booked" });
-
-  const result = await bookingCollection.insertOne({
-    ...booking,
-    status: "booked",
-    createdAt: new Date(),
-  });
-
-  await tutorCollection.updateOne(
-    { _id: new ObjectId(booking.tutorId) },
-    { $inc: { totalSlot: -1 } }
-  );
-
-  res.send(result);
-});
-
-app.get("/my-bookings", async (req, res) => {
-  const result = await bookingCollection
-    .find({ studentEmail: req.query.email })
-    .toArray();
-
-  res.send(result);
-});
-
-app.patch("/bookings/:id", async (req, res) => {
-  const booking = await bookingCollection.findOne({
-    _id: new ObjectId(req.params.id),
-  });
-
-  if (!booking) return res.send({ message: "Not found" });
-
-  if (booking.status === "cancelled")
-    return res.send({ message: "Already cancelled" });
+  const updateDoc = {
+    $set: {
+      tutorName: req.body.tutorName,
+      studentName: req.body.studentName,
+      subject: req.body.subject,
+      phone: req.body.phone,
+      sessionStart: req.body.sessionStart,
+    },
+  };
 
   const result = await bookingCollection.updateOne(
-    { _id: new ObjectId(req.params.id) },
-    { $set: { status: "cancelled" } }
-  );
-
-  await tutorCollection.updateOne(
-    { _id: new ObjectId(booking.tutorId) },
-    { $inc: { totalSlot: 1 } }
+    { _id: new ObjectId(id) },
+    updateDoc
   );
 
   res.send(result);
 });
 
-app.patch("/bookings/update/:id", async (req, res) => {
-  const result = await bookingCollection.updateOne(
-    { _id: new ObjectId(req.params.id) },
-    {
-      $set: {
-        tutorName: req.body.tutorName,
-        studentName: req.body.studentName,
-        subject: req.body.subject,
-        phone: req.body.phone,
-        sessionStart: req.body.sessionStart,
-      },
-    }
-  );
+    // =======================
+    // DELETE BOOKING
+    // =======================
+    app.delete("/bookings/:id", async (req, res) => {
+      const booking = await bookingCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
 
-  res.send(result);
-});
+      if (!booking) return res.send({ message: "Not found" });
 
-app.delete("/bookings/:id", async (req, res) => {
-  const booking = await bookingCollection.findOne({
-    _id: new ObjectId(req.params.id),
-  });
+      await tutorCollection.updateOne(
+        { _id: new ObjectId(booking.tutorId) },
+        { $inc: { totalSlot: 1 } }
+      );
 
-  if (!booking) return res.send({ message: "Not found" });
+      const result = await bookingCollection.deleteOne({
+        _id: new ObjectId(req.params.id),
+      });
 
-  await tutorCollection.updateOne(
-    { _id: new ObjectId(booking.tutorId) },
-    { $inc: { totalSlot: 1 } }
-  );
+      res.send(result);
+    });
 
-  const result = await bookingCollection.deleteOne({
-    _id: new ObjectId(req.params.id),
-  });
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-  res.send(result);
-});
 
 // =======================
-// ROOT
+// START SERVER
 // =======================
-app.get("/", (req, res) => {
-  res.send("MediQueue Server Running");
-});
+// app.listen(port, () => {
+//   console.log(`Server running on port ${port}`);
+// });
 
-module.exports = app;
+
+
+// app.get("/featured-tutors", async (req, res) => {
+//   const result = await tutorCollection.find().limit(6).toArray();
+//   res.send(result);
+// });
+
+// run().catch(console.dir);
+
+// app.get("/", (req, res) => {
+//   res.send("MediQueue Server Running");
+// });
+
+// module.exports = app;
+

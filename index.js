@@ -62,11 +62,11 @@ const client = new MongoClient(uri, {
 // =======================
     let isConnected = false;
 
-async function run() {
-  try {
-    if (!isConnected) {
-      await client.connect();
-      isConnected = true;
+  async function run() {
+    try {
+      if (!isConnected) {
+        await client.connect();
+        isConnected = true;
       
     }
 
@@ -291,6 +291,28 @@ async function run() {
 }
 
 
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// =======================
+// RUN DATABASE
+// =======================
+run().catch(console.error);
+
+// =======================
+// ROOT ROUTE
+// =======================
+app.get("/", (req, res) => {
+  res.send("MediQueue Server Running");
+});
+
+// =======================
+// EXPORT FOR VERCEL
+// =======================
+module.exports = app;
 // =======================
 // START SERVER
 // =======================

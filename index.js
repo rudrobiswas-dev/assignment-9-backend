@@ -14,7 +14,7 @@ const {
 const jwt = require("jsonwebtoken");
 
 const app = express();
-const port = process.env.PORT || 5000;
+// const port = process.env.PORT || 5000;
 
 // =======================
 // MIDDLEWARE
@@ -60,11 +60,21 @@ const client = new MongoClient(uri, {
 // =======================
 // MAIN RUN
 // =======================
+    let isConnected = false;
+
 async function run() {
   try {
+    if (!isConnected) {
+      await client.connect();
+      isConnected = true;
+      
+    }
+
     const db = client.db("mediqueueDB");
     const tutorCollection = db.collection("tutors");
     const bookingCollection = db.collection("bookings");
+
+    // routes...
 
     // =======================
     // JWT TOKEN
@@ -252,11 +262,6 @@ async function run() {
   res.send(result);
 });
 
-
-
-
-
-
     // =======================
     // DELETE BOOKING
     // =======================
@@ -285,6 +290,29 @@ async function run() {
   }
 }
 
+
+// =======================
+// START SERVER
+// =======================
+// app.listen(port, () => {
+//   console.log(`Server running on port ${port}`);
+// });
+
+
+
+// app.get("/featured-tutors", async (req, res) => {
+//   const result = await tutorCollection.find().limit(6).toArray();
+//   res.send(result);
+// });
+
+// run().catch(console.dir);
+
+// app.get("/", (req, res) => {
+//   res.send("MediQueue Server Running");
+// });
+
+// module.exports = app;
+
 run().catch(console.dir);
 
 // =======================
@@ -294,9 +322,4 @@ app.get("/", (req, res) => {
   res.send("MediQueue Server Running");
 });
 
-// =======================
-// START SERVER
-// =======================
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;

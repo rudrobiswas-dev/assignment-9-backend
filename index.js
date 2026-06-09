@@ -299,6 +299,22 @@ app.get("/", (req, res) => {
   res.send("MediQueue Server Running");
 });
 
+app.get("/health", async (req, res) => {
+  try {
+    await client.db("admin").command({ ping: 1 });
+
+    res.send({
+      success: true,
+      message: "MongoDB Connected",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "MongoDB Disconnected",
+    });
+  }
+});
+
 module.exports = app;
 
 // =======================
